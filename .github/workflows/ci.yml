@@ -1,0 +1,93 @@
+# .github/workflows/ci.yml
+# ---------------------------------------------------------------------------
+# CI for the Yardi Finance Ops RAG.
+#
+# TWO-TIER DESIGN (cost-aware):
+#   - smoke (every push & PR): fast, FREE. Installs deps and imports every
+#     module to catch syntax/import breakage. No API calls.
+#   - eval-gate (PRs to main + manual): the expensive 20-question golden eval.
+#     Runs only when it matters -- before code merges to main -- so we don't
+#     burn API credits on every small push, and a flaky LLM run can't fail an
+#     unrelated commit.
+#
+# The API key is injected from an encrypted GitHub Actions secret, never stored
+# in this file.
+# ---------------------------------------------------------------------------
+name: CI
+
+on:
+  push:
+    branches: ["**"]          # smoke runs on every branch push
+  pull_request:
+    branches: ["main"]        # eval-gate runs on PRs targeting main
+  workflow_dispatch: {}        # allow manual "Run workflow" from the Actions tab
+
+jobs:
+  # -----------------------------------------------------------------------
+  # Tier 1: fast, free sanity check. Runs on every push and PR.
+  # -----------------------------------------------------------------------
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ hashFiles('requirements.txt') }}
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Import check (no API calls)
+        # importing every module catches syntax errors, bad imports, and
+        # obvious breakage without spending a cent on the LLM.
+        run: |
+          python -c "import app.state, app.graph, app.router, app.retrieval, app.generation, app.sql_rag, app.sql_validator, app.sql_config, app.fusion, app.api; print('all modules import OK')"
+
+  # -----------------------------------------------------------------------
+  # Tier 2: the eval gate. Runs on PRs to main and manual dispatch only.
+  # Builds the vector store fresh, then runs all 20 golden questions.
+  # Fails the job (blocks the merge) if any golden question fails.
+  # -----------------------------------------------------------------------
+  eval-gate:
+    # only run this expensive job on PRs to main or a manual trigger -- NOT on
+    # every push.
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ hashFiles('requirements.txt') }}
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build the vector store (parse -> chunk -> embed)
+        # the qdrant_store isn't committed (it's gitignored & regenerable), so
+        # CI rebuilds it from the PDFs. This also proves the ingestion pipeline
+        # still works end to end.
+        run: |
+          python ingestion/parse_sops.py
+          python ingestion/chunker.py
+          python ingestion/embedder.py
+
+      - name: Run golden-question eval gate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python -m app.evaluate

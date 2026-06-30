@@ -130,6 +130,7 @@ def run_eval(use_judge: bool):
         })
 
     _report(results, use_judge)
+    return all(r["passed"] for r in results if r["passed"] is not None)
 
 
 def _judge(question: str, expected: str, actual: str) -> bool:
@@ -175,10 +176,17 @@ def _report(results, use_judge):
     print(f"PASSED {passed_count}/{total_scored} scored questions "
           f"({'with' if use_judge else 'no'} LLM judge)")
 
+    # Return whether everything passed, so the CLI can exit non-zero on failure.
+    # A CI gate MUST fail the build when a golden question fails -- otherwise
+    # it's not a gate. sys.exit(1) below makes GitHub Actions mark the job red.
+    return passed_count == total_scored
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--judge", action="store_true",
                         help="also LLM-judge prose answers (slower, costs calls)")
     args = parser.parse_args()
-    run_eval(use_judge=args.judge)
+    all_passed = run_eval(use_judge=args.judge)
+    # non-zero exit on failure so CI (and any script) can gate on the result.
+    sys.exit(0 if all_passed else 1)
