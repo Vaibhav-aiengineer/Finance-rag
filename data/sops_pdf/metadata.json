@@ -1,0 +1,203 @@
+{
+  "SOP-AP-001": {
+    "doc_id": "SOP-AP-001",
+    "title": "Accounts Payable Invoice Processing and PayScan Approval Workflow",
+    "version": "2.1",
+    "effective_date": "2024-07-01",
+    "supersedes": null,
+    "superseded_by": null,
+    "access_roles": [
+      "ap_clerk",
+      "staff_accountant",
+      "property_controller",
+      "admin"
+    ],
+    "category": "Accounts Payable",
+    "source_pdf": "SOP-AP-001_invoice_processing.pdf"
+  },
+  "SOP-AR-001": {
+    "doc_id": "SOP-AR-001",
+    "title": "Accounts Receivable Aging and Collections Procedure",
+    "version": "1.3",
+    "effective_date": "2024-05-01",
+    "supersedes": null,
+    "superseded_by": null,
+    "access_roles": [
+      "staff_accountant",
+      "property_controller",
+      "admin"
+    ],
+    "category": "Accounts Receivable",
+    "source_pdf": "SOP-AR-001_ar_collections.pdf"
+  },
+  "SOP-BANK-001": {
+    "doc_id": "SOP-BANK-001",
+    "title": "Bank Reconciliation Procedure",
+    "version": "1.0",
+    "effective_date": "2024-02-15",
+    "supersedes": null,
+    "superseded_by": null,
+    "access_roles": [
+      "staff_accountant",
+      "property_controller",
+      "admin"
+    ],
+    "category": "Treasury",
+    "source_pdf": "SOP-BANK-001_bank_reconciliation.pdf"
+  },
+  "SOP-CAM-001": {
+    "doc_id": "SOP-CAM-001",
+    "title": "Common Area Maintenance (CAM) Reconciliation Procedure",
+    "version": "2.0",
+    "effective_date": "2024-02-01",
+    "supersedes": null,
+    "superseded_by": null,
+    "access_roles": [
+      "staff_accountant",
+      "property_controller",
+      "admin"
+    ],
+    "category": "Recoveries",
+    "source_pdf": "SOP-CAM-001_cam_reconciliation.pdf"
+  },
+  "SOP-CLOSE-001": {
+    "doc_id": "SOP-CLOSE-001",
+    "title": "Month-End Close Checklist and Procedure",
+    "version": "3.0",
+    "effective_date": "2024-09-01",
+    "supersedes": null,
+    "superseded_by": null,
+    "access_roles": [
+      "staff_accountant",
+      "property_controller",
+      "admin"
+    ],
+    "category": "Period Close",
+    "source_pdf": "SOP-CLOSE-001_month_end_close.pdf"
+  },
+  "SOP-DEP-001": {
+    "doc_id": "SOP-DEP-001",
+    "title": "Security Deposit Accounting Treatment",
+    "version": "1.1",
+    "effective_date": "2024-04-01",
+    "supersedes": null,
+    "superseded_by": null,
+    "access_roles": [
+      "ap_clerk",
+      "staff_accountant",
+      "property_controller",
+      "admin"
+    ],
+    "category": "Balance Sheet",
+    "source_pdf": "SOP-DEP-001_security_deposits.pdf"
+  },
+  "SOP-GL-001": {
+    "doc_id": "SOP-GL-001",
+    "title": "General Ledger Account Coding Standards",
+    "version": "1.4",
+    "effective_date": "2024-01-15",
+    "supersedes": null,
+    "superseded_by": null,
+    "access_roles": [
+      "staff_accountant",
+      "property_controller",
+      "admin"
+    ],
+    "category": "General Ledger",
+    "source_pdf": "SOP-GL-001_coding_standards.pdf"
+  },
+  "SOP-JE-001": {
+    "doc_id": "SOP-JE-001",
+    "title": "Journal Entry Approval Matrix",
+    "version": "1.0",
+    "effective_date": "2022-01-01",
+    "supersedes": null,
+    "superseded_by": "SOP-JE-002",
+    "status": "SUPERSEDED",
+    "access_roles": [
+      "staff_accountant",
+      "property_controller",
+      "admin"
+    ],
+    "category": "General Ledger",
+    "source_pdf": "SOP-JE-001_je_approval_matrix_SUPERSEDED.pdf"
+  },
+  "SOP-JE-002": {
+    "doc_id": "SOP-JE-002",
+    "title": "Journal Entry Approval Matrix",
+    "version": "2.0",
+    "effective_date": "2024-06-01",
+    "supersedes": "SOP-JE-001",
+    "superseded_by": null,
+    "status": "CURRENT",
+    "access_roles": [
+      "staff_accountant",
+      "property_controller",
+      "admin"
+    ],
+    "category": "General Ledger",
+    "source_pdf": "SOP-JE-002_je_approval_matrix_CURRENT.pdf"
+  },
+  "SOP-LEASE-001": {
+    "doc_id": "SOP-LEASE-001",
+    "title": "Lease Abstraction and Data Entry Standards",
+    "version": "1.0",
+    "effective_date": "2024-01-10",
+    "supersedes": null,
+    "superseded_by": null,
+    "access_roles": [
+      "staff_accountant",
+      "property_controller",
+      "admin"
+    ],
+    "category": "Lease Administration",
+    "source_pdf": "SOP-LEASE-001_lease_abstraction.pdf"
+  },
+  "SOP-REV-001": {
+    "doc_id": "SOP-REV-001",
+    "title": "Recurring Charges and Rent Escalation Setup",
+    "version": "1.2",
+    "effective_date": "2024-03-01",
+    "supersedes": null,
+    "superseded_by": null,
+    "access_roles": [
+      "staff_accountant",
+      "property_controller",
+      "admin"
+    ],
+    "category": "Revenue",
+    "source_pdf": "SOP-REV-001_recurring_charges.pdf"
+  },
+  "SOP-RPT-001": {
+    "doc_id": "SOP-RPT-001",
+    "title": "Budget versus Actual Variance Reporting",
+    "version": "1.1",
+    "effective_date": "2024-08-01",
+    "supersedes": null,
+    "superseded_by": null,
+    "access_roles": [
+      "staff_accountant",
+      "property_controller",
+      "regional_manager",
+      "admin"
+    ],
+    "category": "Reporting",
+    "source_pdf": "SOP-RPT-001_variance_reporting.pdf"
+  },
+  "SOP-VEN-001": {
+    "doc_id": "SOP-VEN-001",
+    "title": "Vendor Setup and Compliance Verification",
+    "version": "1.2",
+    "effective_date": "2024-06-15",
+    "supersedes": null,
+    "superseded_by": null,
+    "access_roles": [
+      "ap_clerk",
+      "staff_accountant",
+      "property_controller",
+      "admin"
+    ],
+    "category": "Accounts Payable",
+    "source_pdf": "SOP-VEN-001_vendor_setup.pdf"
+  }
+}

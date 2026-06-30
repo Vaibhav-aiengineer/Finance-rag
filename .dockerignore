@@ -1,0 +1,17 @@
+# keep the build context small and the image clean
+.venv/
+__pycache__/
+*.pyc
+.git/
+.env
+.fastembed_cache/
+
+# the parsed/chunks intermediates aren't needed in the image -- only the final
+# qdrant_store and DB are. (If you prefer to rebuild the store inside the
+# image later, you'd copy these instead. For now they're regenerable locally.)
+data/parsed/
+data/chunks/
+
+# notes, docs, etc.
+*.md
+!README.md

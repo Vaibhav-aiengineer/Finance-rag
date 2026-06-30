@@ -1,0 +1,71 @@
+# Yardi Finance Ops RAG -- requirements.txt
+# Target: Python 3.11 
+#
+# Install with uv (recommended -- much faster resolution than plain pip):
+#   uv venv --python 3.11 .venv
+#   .venv\Scripts\activate          (Windows)
+#   uv pip install -r requirements.txt
+#
+# Or with plain pip inside an already-activated 3.11 venv:
+#   pip install -r requirements.txt
+
+# ---------------------------------------------------------------------------
+# Phase 1: Parsing
+# ---------------------------------------------------------------------------
+# Docling pulls in torch + layout/table model dependencies as part of its own
+# install -- expect a several-minute first install and a one-time model
+# download on first use. This is normal.
+docling>=2.5.0,<3.0.0
+
+# ---------------------------------------------------------------------------
+# Phase 2: Chunking
+# ---------------------------------------------------------------------------
+# No extra dependencies -- chunking is plain Python string/regex logic over
+# the Markdown Docling produces, same as MediBot.
+
+# ---------------------------------------------------------------------------
+# Phase 3: Embeddings + Reranking
+# ---------------------------------------------------------------------------
+# fastembed (ONNX-runtime based) instead of sentence-transformers directly --
+# this is the same choice you made on your first RAG project after hitting a
+# PyTorch DLL failure on Windows. It runs bge-small-en-v1.5 without needing a
+# separate torch runtime for inference, and it also supports cross-encoder
+# reranking (ms-marco-MiniLM-L-6-v2), so one lightweight library covers both
+# embeddings and reranking.
+fastembed>=0.4.0,<0.5.0
+
+# ---------------------------------------------------------------------------
+# Phase 3: Vector store + keyword search
+# ---------------------------------------------------------------------------
+qdrant-client>=1.11.0,<2.0.0
+rank-bm25>=0.2.2,<0.3.0
+
+# ---------------------------------------------------------------------------
+# Phase 3/4: LLM calls (SQL generation, answer generation, formatting)
+# ---------------------------------------------------------------------------
+anthropic>=0.40.0,<1.0.0
+python-dotenv>=1.0.0,<2.0.0       # keeps your API key out of source code
+
+# ---------------------------------------------------------------------------
+# Phase 4: Orchestration
+# ---------------------------------------------------------------------------
+# LangGraph pulls in langchain-core as a dependency automatically -- you are
+# NOT adding the full LangChain framework here, just the graph/state-machine
+# piece, consistent with the decision to skip LangChain's chains/abstractions
+# while using LangGraph specifically for the router/fusion/retry logic.
+langgraph>=0.2.0,<0.3.0
+
+# ---------------------------------------------------------------------------
+# Phase 5: Evaluation
+# ---------------------------------------------------------------------------
+# Optional -- only needed once you reach the eval phase. Commented out for
+# now since it pulls in its own dependency tree and isn't needed for
+# parsing/chunking/embedding. Uncomment when you get there:
+# ragas>=0.2.0,<0.3.0
+
+# ---------------------------------------------------------------------------
+# Phase 6: Deployment
+# ---------------------------------------------------------------------------
+fastapi>=0.115.0,<1.0.0
+uvicorn[standard]>=0.30.0,<1.0.0
+pydantic>=2.8.0,<3.0.0

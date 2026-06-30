@@ -1,0 +1,178 @@
+{
+  "description": "Golden evaluation set for the Yardi Finance Ops RAG assistant. Each item has a known-correct answer used to measure retrieval, routing, SQL, and version/RBAC handling. Run every change against this set instead of eyeballing.",
+  "schema_note": "expected_route is 'doc_rag', 'sql_rag', or 'fusion'. answers reflect the deterministic seed=42 dataset; if you change the generator seed, recompute the analytical answers.",
+  "questions": [
+    {
+      "id": "Q01",
+      "category": "procedural",
+      "expected_route": "doc_rag",
+      "question": "How do vendor invoices get approved and what are the approval thresholds?",
+      "expected_answer": "Invoices enter through the PayScan inbox, are GL-coded by the AP clerk, and route by amount: up to $5,000 to the Senior Accountant, $5,001-$25,000 to the Property Controller, and above $25,000 to the CFO. Approvals must be recorded in PayScan and an approver cannot approve their own request.",
+      "must_cite": ["SOP-AP-001"]
+    },
+    {
+      "id": "Q02",
+      "category": "procedural",
+      "expected_route": "doc_rag",
+      "question": "Which expense accounts are eligible to be included in a CAM reconciliation?",
+      "expected_answer": "Repairs & Maintenance (5000), Utilities (5010), Janitorial & Cleaning (5020), Landscaping (5030), and Security Services (5070). Property taxes and insurance are recovered separately unless the lease states otherwise.",
+      "must_cite": ["SOP-GL-001", "SOP-CAM-001"]
+    },
+    {
+      "id": "Q03",
+      "category": "procedural",
+      "expected_route": "doc_rag",
+      "question": "What control accounts have to be reconciled before closing the month?",
+      "expected_answer": "Accounts Receivable, Accounts Payable, Security Deposits, Prepaid Expenses, Cash-Operating (via bank rec), and Suspense/Clearing (which must be zero). Net income must also tie to the change in retained earnings.",
+      "must_cite": ["SOP-CLOSE-001"]
+    },
+    {
+      "id": "Q04",
+      "category": "version_handling",
+      "expected_route": "doc_rag",
+      "question": "What is the current approval threshold for a manual journal entry over $40,000?",
+      "expected_answer": "Under the current matrix (SOP-JE-002, effective 2024-06-01), an entry from $5,001 to $50,000 requires Property Controller approval, so a $40,000 entry needs Controller approval. The old SOP-JE-001 (Controller ceiling of $10,000) is superseded and must not be used.",
+      "must_cite": ["SOP-JE-002"],
+      "must_not_cite_as_current": ["SOP-JE-001"],
+      "tests": "Retrieval must prefer the CURRENT version over the superseded one even though both are semantically similar."
+    },
+    {
+      "id": "Q05",
+      "category": "version_handling",
+      "expected_route": "doc_rag",
+      "question": "Can a staff accountant self-approve their own journal entries?",
+      "expected_answer": "No. Under the current matrix, self-approval is no longer permitted at any dollar amount; every manual journal entry requires approval by someone other than the preparer. (The superseded SOP-JE-001 previously allowed self-approval up to $2,500.)",
+      "must_cite": ["SOP-JE-002"]
+    },
+    {
+      "id": "Q06",
+      "category": "procedural",
+      "expected_route": "doc_rag",
+      "question": "When a tenant pays a security deposit, how is it recorded?",
+      "expected_answer": "As a liability in account 6020 (Security Deposits Held) with the offset to operating cash. It is never recorded as income when received, since it does not belong to the property until forfeited or applied per the lease.",
+      "must_cite": ["SOP-DEP-001"]
+    },
+    {
+      "id": "Q07",
+      "category": "procedural",
+      "expected_route": "doc_rag",
+      "question": "How is a fixed-percentage rent escalation supposed to be configured?",
+      "expected_answer": "As a scheduled step entered in advance so it applies automatically on the anniversary date; manually changing rent each year is not permitted. A 3% escalation on $10,000 rent yields $10,300 then $10,609, compounding on the prior year's rent unless the lease specifies the original base.",
+      "must_cite": ["SOP-REV-001"]
+    },
+    {
+      "id": "Q08",
+      "category": "analytical",
+      "expected_route": "sql_rag",
+      "question": "How many AP invoices are currently pending approval?",
+      "expected_answer": "19 invoices have approval_status of Pending.",
+      "expected_sql_intent": "COUNT of ap_invoices where approval_status='Pending'",
+      "ground_truth_value": 19
+    },
+    {
+      "id": "Q09",
+      "category": "analytical",
+      "expected_route": "sql_rag",
+      "question": "What is the total dollar amount of all pending AP invoices?",
+      "expected_answer": "Approximately $613,996.20 across all pending invoices.",
+      "expected_sql_intent": "SUM(amount) of ap_invoices where approval_status='Pending'",
+      "ground_truth_value": 613996.20
+    },
+    {
+      "id": "Q10",
+      "category": "analytical",
+      "expected_route": "sql_rag",
+      "question": "How many properties are in the portfolio?",
+      "expected_answer": "8 properties.",
+      "expected_sql_intent": "COUNT of properties",
+      "ground_truth_value": 8
+    },
+    {
+      "id": "Q11",
+      "category": "analytical",
+      "expected_route": "sql_rag",
+      "question": "How many office properties do we manage?",
+      "expected_answer": "5 properties are of type Office.",
+      "expected_sql_intent": "COUNT of properties where property_type='Office'",
+      "ground_truth_value": 5
+    },
+    {
+      "id": "Q12",
+      "category": "analytical",
+      "expected_route": "sql_rag",
+      "question": "Which property had the largest CAM variance in 2024?",
+      "expected_answer": "CHI-420 (Loop Financial Center) had the largest 2024 CAM variance, about $16,923.52.",
+      "expected_sql_intent": "ORDER BY ABS(variance) DESC on cam_reconciliations where recon_year=2024",
+      "ground_truth_value": "CHI-420"
+    },
+    {
+      "id": "Q13",
+      "category": "analytical",
+      "expected_route": "sql_rag",
+      "question": "What properties are in the West region?",
+      "expected_answer": "Wilshire Corporate Campus (LAX-640) and Mission Bay Tech Hub (SFO-750).",
+      "expected_sql_intent": "SELECT property_name FROM properties WHERE region='West'",
+      "ground_truth_value": ["Wilshire Corporate Campus", "Mission Bay Tech Hub"]
+    },
+    {
+      "id": "Q14",
+      "category": "fusion",
+      "expected_route": "fusion",
+      "question": "For the Riverside Industrial Park, what were the total repairs & maintenance costs in 2024, and are those costs eligible to be recovered through CAM?",
+      "expected_answer": "Repairs & Maintenance (account 5000) for CHI-455 totaled about $51,137.86 in 2024. Per the coding standards and CAM procedure, account 5000 is CAM-eligible, so these costs can be included in the CAM pool (subject to lease exclusions and caps).",
+      "expected_sql_intent": "SUM(debit) of gl_transactions for property_code='CHI-455' and gl_account='5000'",
+      "ground_truth_value": 51137.86,
+      "must_cite": ["SOP-CAM-001", "SOP-GL-001"],
+      "tests": "Requires BOTH a SQL lookup (the number) AND document retrieval (the recoverability rule) combined into one answer."
+    },
+    {
+      "id": "Q15",
+      "category": "rbac",
+      "expected_route": "sql_rag",
+      "question": "As a regional manager, can I see the individual GL transactions for a property?",
+      "expected_answer": "No. Per the variance reporting procedure, the regional manager receives portfolio-level summaries and property-level variance commentary but not transaction-level detail. Transaction-level GL access is restricted to staff accountant, controller, and admin roles.",
+      "must_cite": ["SOP-RPT-001"],
+      "tests": "The system should refuse transaction-level data for a regional_manager role even though the question is analytical."
+    },
+    {
+      "id": "Q16",
+      "category": "procedural",
+      "expected_route": "doc_rag",
+      "question": "What documentation is required before a new vendor can be paid?",
+      "expected_answer": "A completed W-9 (or W-8 for foreign vendors), remit-to address, and a certificate of insurance where on-site work is performed. The vendor cannot be paid until the W-9 is on file.",
+      "must_cite": ["SOP-VEN-001"]
+    },
+    {
+      "id": "Q17",
+      "category": "procedural",
+      "expected_route": "doc_rag",
+      "question": "A vendor emailed asking us to update their bank account for payments. What should we do?",
+      "expected_answer": "Verify the change by contacting the vendor through a known phone number already on file, not a number provided in the change request itself. This control prevents payment redirection fraud.",
+      "must_cite": ["SOP-VEN-001"]
+    },
+    {
+      "id": "Q18",
+      "category": "procedural",
+      "expected_route": "doc_rag",
+      "question": "At what point does a past-due tenant balance get escalated to the Controller?",
+      "expected_answer": "When the balance is over 90 days past due. At 1-30 days an automated reminder is sent, 31-60 days the property manager makes contact, 61-90 days a demand letter is issued, and over 90 days it escalates to the Controller for legal action or reserve.",
+      "must_cite": ["SOP-AR-001"]
+    },
+    {
+      "id": "Q19",
+      "category": "procedural",
+      "expected_route": "doc_rag",
+      "question": "When does a budget variance require written commentary?",
+      "expected_answer": "When it exceeds the greater of 10% of the budgeted line or $5,000 for the period. Commentary must explain the driver and classify the variance as one-time or recurring.",
+      "must_cite": ["SOP-RPT-001"]
+    },
+    {
+      "id": "Q20",
+      "category": "out_of_scope",
+      "expected_route": "doc_rag",
+      "question": "What is the capital of France?",
+      "expected_answer": "The system should recognize this is outside the finance knowledge base and decline rather than retrieve an irrelevant SOP. No SOP answers this.",
+      "tests": "Confidence threshold should reject when no chunk is relevant, instead of forcing an answer."
+    }
+  ]
+}

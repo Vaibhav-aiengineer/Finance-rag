@@ -1,0 +1,15 @@
+# secrets -- never commit your API key
+.env
+
+# python
+__pycache__/
+*.pyc
+.venv/
+
+# generated artifacts (regenerable from scripts; no need to version)
+data/parsed/
+data/chunks/
+data/qdrant_store/
+
+# model caches
+.fastembed_cache/
